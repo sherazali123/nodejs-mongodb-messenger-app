@@ -1,7 +1,7 @@
 {
   "name": "messenger",
   "version": "0.0.1",
-  "main": "app.js",
+  "main": "server.js",
   "dependencies": {
     "body-parser": "^1.15.0",
     "connect": "^3.4.1",
