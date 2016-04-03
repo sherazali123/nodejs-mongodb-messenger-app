@@ -1,5 +1,5 @@
 var
-  user        = require('config/models');
+  user        = require('../models/user');
 
 exports.show = function(token, callback){
   user.find({token: token}, function(err, users){
@@ -9,7 +9,7 @@ exports.show = function(token, callback){
     if(len !== 0){
       var found = users[0];
       callback({status: 'success', msg: 'User found.', user: {
-        username: found.username,
+        email: found.email,
         gender: found.gender,
         token: token,
       }});
@@ -29,7 +29,7 @@ exports.index = function(token, callback){
 
 };
 
-exports.create = function(username, password, gender, callback){
+exports.create = function(email, password, gender, callback){
 
 };
 

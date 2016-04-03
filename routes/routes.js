@@ -1,26 +1,18 @@
-var chgpass         = require('config/chgpass');
-var register        = require('config/register');
-var login           = require('config/login');
+var
+  chgpass         = require('../auth/chgpass'),
+  register        = require('../auth/register'),
+  login           = require('../auth/login'),
+  user_controller  = require('../apis/users');
 
 
-module.exports      = function(app, expressValidator){
-
-  app.use(expressValidator({
-    customValidators: {
-      isValidGender: function(gender) {
-        if(['male', 'female', 'other'].indexOf(gender) !== -1){
-          return true;
-        }
-        return false;
-      }
-    }
-  }));
+module.exports      = function(app){
 
   app.get('/', function(req,res){
     res.end("NodeJS-WebApis-Started");
   });
 
   app.post('/login', function(req, res){
+    console.log(req);
     req.checkBody("email", "Enter a valid email address.").isEmail();
     req.checkBody("password", "Enter a password.").notEmpty();
 
@@ -29,8 +21,9 @@ module.exports      = function(app, expressValidator){
       res.send({status: 'error', errors: errors});
       return;
     } else {
-      var email     = req.body.email,
-          password  = req.body.password;
+      var
+        email     = req.body.email,
+        password  = req.body.password;
       login.login(email, password, function(found){
         console.log(found);
         res.json(found);
@@ -53,7 +46,7 @@ module.exports      = function(app, expressValidator){
       var
         email     = req.body.email,
         password  = req.body.password;
-        gender  = req.body.genger;
+        gender  = req.body.gender;
       register.register(email, password, gender, function(found){
         console.log(found);
         res.json(found);
@@ -91,4 +84,25 @@ module.exports      = function(app, expressValidator){
     });
   });
 
+  /************ token specific routes start ***************/
+  // user
+
+  app.get('/user/:token?', function(req, res){
+
+    req.checkParams("token", "Token is missing.").notEmpty();
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        token = req.params.token;
+      user_controller.show(token, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+
+  });
+
+  /************ token specific routes end ****************/
 };

@@ -2,7 +2,7 @@ var
   crypto      = require('crypto'),
   rand        = require('csprng'),
   mongoose    = require('mongoose'),
-  user        = require('config/models');
+  user        = require('../models/user');
 
 exports.register = function(email, password, gender, callback){
   var
@@ -18,6 +18,7 @@ exports.register = function(email, password, gender, callback){
      token: token,
      email: email,
      hashed_password: hashed_password,
+     gender: gender,
      salt :temp
     });
   // find if email already exists
@@ -30,6 +31,8 @@ exports.register = function(email, password, gender, callback){
       newuser.save(function (err) {
         callback({status: 'success', msg: "Sucessfully Registered", user: {
           token: newuser.token,
+          email: newuser.email,
+          gender: newuser.gender,
         }});
       });
     } else {

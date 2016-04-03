@@ -3,7 +3,7 @@ var
   rand          = require('csprng'),
   mongoose      = require('mongoose'),
   gravatar      = require('gravatar'),
-  user          = require('config/models');
+  user          = require('../models/user');
 
 exports.login = function(email,password,callback) {
 
@@ -21,7 +21,9 @@ exports.login = function(email,password,callback) {
 
       if(hash_db == hashed_password){
         callback({status: 'success', msg: "Sucessfully login", user: {
-          token: id
+          token: id,
+          email: users[0].email,
+          gender: users[0].gender,
         }});
       } else {
         callback({status: 'error', errors: [{
