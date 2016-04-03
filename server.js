@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(validator());
 // Routes
-require('./routes/routes.js')(app);
+require('./routes/routes.js')(app,validator);
 // Listen on the port
 app.listen(port);
 console.log("The app runs on port " + port);
