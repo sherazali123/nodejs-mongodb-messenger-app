@@ -8,7 +8,11 @@ var userSchema      = mongoose.Schema({
   hashed_password: String,
   gender: String,
   salt: String,
-  temp_str: String
+  temp_str: String,
+  status: Number,
+  display_name: String,
+  phone_no: String,
+  mood: String
 });
 
 // connect with DB

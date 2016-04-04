@@ -4,7 +4,7 @@ var
   mongoose    = require('mongoose'),
   user        = require('../models/user');
 
-exports.register = function(email, password, gender, callback){
+exports.register = function(email, password, gender, display_name, phone_no, mood, status, callback){
   var
     // a random string used add salt in the password
     temp              = rand(160, 36),
@@ -19,7 +19,11 @@ exports.register = function(email, password, gender, callback){
      email: email,
      hashed_password: hashed_password,
      gender: gender,
-     salt :temp
+     salt: temp,
+     display_name: display_name,
+     phone_no: phone_no,
+     mood: mood,
+     status: status
     });
   // find if email already exists
   user.find({email: email},function(err,users){
@@ -33,6 +37,10 @@ exports.register = function(email, password, gender, callback){
           token: newuser.token,
           email: newuser.email,
           gender: newuser.gender,
+          display_name: newuser.display_name,
+          phone_no: newuser.phone_no,
+          mood: newuser.mood,
+          status: newuser.status
         }});
       });
     } else {

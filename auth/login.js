@@ -24,6 +24,10 @@ exports.login = function(email,password,callback) {
           token: id,
           email: users[0].email,
           gender: users[0].gender,
+          display_name: users[0].display_name,
+          phone_no: users[0].phone_no,
+          mood: users[0].mood,
+          status: users[0].status
         }});
       } else {
         callback({status: 'error', errors: [{

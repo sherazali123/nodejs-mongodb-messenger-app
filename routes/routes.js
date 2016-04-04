@@ -44,10 +44,14 @@ module.exports      = function(app){
       return;
     } else {
       var
-        email     = req.body.email,
-        password  = req.body.password;
-        gender  = req.body.gender;
-      register.register(email, password, gender, function(found){
+        email             = req.body.email,
+        password          = req.body.password;
+        gender            = req.body.gender,
+        display_name      = req.body.display_name ? req.body.display_name : '',
+        phone_no          = req.body.phone_no ? req.body.phone_no : '',
+        mood              = req.body.mood ? req.body.mood : '',
+        status            = 1;
+      register.register(email, password, gender, display_name, phone_no, mood, status, function(found){
         console.log(found);
         res.json(found);
       });
@@ -87,20 +91,46 @@ module.exports      = function(app){
   /************ token specific routes start ***************/
   // user
 
-  app.get('/user/:token?', function(req, res){
+  app.get('/user', function(req, res){
 
-    req.checkParams("token", "Token is missing.").notEmpty();
+    req.checkHeaders("token", "Token is missing.").notEmpty();
     var errors = req.validationErrors();
     if(errors){
       res.send({status: 'error', errors: errors});
     } else {
       var
-        token = req.params.token;
+        token = req.headers.token;
       user_controller.show(token, function(found){
         console.log(found);
         res.json(found);
       });
     }
+
+  });
+
+  app.put('/user', function(req, res){
+    req.checkHeaders("token", "Token is missing.").notEmpty();
+    req.checkBody("display_name", "Enter a display name.").notEmpty();
+    req.checkBody("mood", "Enter a status mood.").notEmpty();
+    req.checkBody("phone_no", "Enter a valid phone no.").notEmpty();
+
+    var errors = req.validationErrors();
+    if (errors) {
+      res.send({status: 'error', errors: errors});
+      return;
+    } else {
+      var
+        display_name            = req.body.display_name,
+        mood                    = req.body.mood;
+        phone_no                = req.body.phone_no,
+        token                   = req.headers.token;
+
+      user_controller.update(token, display_name, phone_no, mood, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+
 
   });
 

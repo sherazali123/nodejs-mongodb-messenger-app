@@ -2,16 +2,17 @@ var
   user        = require('../models/user');
 
 exports.show = function(token, callback){
-  user.find({token: token}, function(err, users){
-    var
-      len = users.length;
+  user.findOne({token: token}, function(err, user){
 
-    if(len !== 0){
-      var found = users[0];
+    if(user){
       callback({status: 'success', msg: 'User found.', user: {
-        email: found.email,
-        gender: found.gender,
+        email: user.email,
+        gender: user.gender,
         token: token,
+        display_name: user.display_name,
+        phone_no: user.phone_no,
+        mood: user.mood,
+        status: user.status
       }});
     } else {
       callback({status: 'error', errors: [{
@@ -33,8 +34,33 @@ exports.create = function(email, password, gender, callback){
 
 };
 
-exports.update = function(token, callback){
+exports.update = function(token, display_name, phone_no, mood, callback){
+  user.findOne({token: token}, function(err, user){
 
+    if(user){
+      user.display_name         = display_name;
+      user.phone_no             = phone_no;
+      user.mood                 = mood;
+      user.save();
+      callback({status: 'success', msg: 'User updated.', user: {
+        email: user.email,
+        gender: user.gender,
+        token: token,
+        display_name: user.display_name,
+        phone_no: user.phone_no,
+        mood: user.mood,
+        status: user.status
+      }});
+    } else {
+      callback({status: 'error', errors: [{
+          param: 'token',
+          msg: 'User not found.',
+          value: token,
+        }],
+
+      });
+    }
+  });
 };
 
 exports.delete = function(token, callback){
