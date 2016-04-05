@@ -11,6 +11,7 @@ var userSchema      = mongoose.Schema({
   temp_str: String,
   status: Number,
   display_name: String,
+  dob: { type: Date, default: Date.now },
   phone_no: String,
   mood: String
 });

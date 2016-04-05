@@ -2,6 +2,7 @@ var
   chgpass         = require('../auth/chgpass'),
   register        = require('../auth/register'),
   login           = require('../auth/login'),
+  dateFormat      = require('dateformat'),
   user_controller  = require('../apis/users');
 
 
@@ -35,6 +36,8 @@ module.exports      = function(app){
 
     req.checkBody("email", "Enter a valid email address.").isEmail();
     req.checkBody("password", "Enter a valid password.").notEmpty();
+    req.checkBody("phone_no", "Enter a phone no.").notEmpty();
+    req.checkBody("dob", "Enter valid date of birth.").isValidDob();
     req.checkBody("gender", "Enter a genger (male, female or other).").isValidGender();
     req.assert('confirm_password', 'Passwords do not match').equals(req.body.password);
 
@@ -48,10 +51,11 @@ module.exports      = function(app){
         password          = req.body.password;
         gender            = req.body.gender,
         display_name      = req.body.display_name ? req.body.display_name : '',
-        phone_no          = req.body.phone_no ? req.body.phone_no : '',
+        phone_no          = req.body.phone_no,
+        dob               = req.body.dob,
         mood              = req.body.mood ? req.body.mood : '',
         status            = 1;
-      register.register(email, password, gender, display_name, phone_no, mood, status, function(found){
+      register.register(email, password, gender, display_name, phone_no, dob, mood, status, function(found){
         console.log(found);
         res.json(found);
       });
@@ -113,6 +117,7 @@ module.exports      = function(app){
     req.checkBody("display_name", "Enter a display name.").notEmpty();
     req.checkBody("mood", "Enter a status mood.").notEmpty();
     req.checkBody("phone_no", "Enter a valid phone no.").notEmpty();
+    req.checkBody("dob", "Enter valid date of birth.").isValidDob();
 
     var errors = req.validationErrors();
     if (errors) {
@@ -123,9 +128,10 @@ module.exports      = function(app){
         display_name            = req.body.display_name,
         mood                    = req.body.mood;
         phone_no                = req.body.phone_no,
+        dob                     = req.body.dob,
         token                   = req.headers.token;
 
-      user_controller.update(token, display_name, phone_no, mood, function(found){
+      user_controller.update(token, display_name, phone_no, dob, mood, function(found){
         console.log(found);
         res.json(found);
       });

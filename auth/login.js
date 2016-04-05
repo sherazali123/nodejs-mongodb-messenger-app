@@ -3,6 +3,7 @@ var
   rand          = require('csprng'),
   mongoose      = require('mongoose'),
   gravatar      = require('gravatar'),
+  dateFormat  = require('dateformat'),
   user          = require('../models/user');
 
 exports.login = function(email,password,callback) {
@@ -26,6 +27,7 @@ exports.login = function(email,password,callback) {
           gender: users[0].gender,
           display_name: users[0].display_name,
           phone_no: users[0].phone_no,
+          dob: dateFormat(users[0].dob, "yyyy/mm/dd"),
           mood: users[0].mood,
           status: users[0].status
         }});

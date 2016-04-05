@@ -2,9 +2,10 @@ var
   crypto      = require('crypto'),
   rand        = require('csprng'),
   mongoose    = require('mongoose'),
-  user        = require('../models/user');
+  user        = require('../models/user'),
+  dateFormat  = require('dateformat');
 
-exports.register = function(email, password, gender, display_name, phone_no, mood, status, callback){
+exports.register = function(email, password, gender, display_name, phone_no, dob, mood, status, callback){
   var
     // a random string used add salt in the password
     temp              = rand(160, 36),
@@ -22,6 +23,7 @@ exports.register = function(email, password, gender, display_name, phone_no, moo
      salt: temp,
      display_name: display_name,
      phone_no: phone_no,
+     dob: dob,
      mood: mood,
      status: status
     });
@@ -39,6 +41,7 @@ exports.register = function(email, password, gender, display_name, phone_no, moo
           gender: newuser.gender,
           display_name: newuser.display_name,
           phone_no: newuser.phone_no,
+          dob: dateFormat(newuser.dob, "yyyy/mm/dd"),
           mood: newuser.mood,
           status: newuser.status
         }});
