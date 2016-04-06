@@ -1,5 +1,5 @@
 var
-  chgpass         = require('../auth/chgpass'),
+  change_password         = require('../auth/change_password'),
   register        = require('../auth/register'),
   login           = require('../auth/login'),
   dateFormat      = require('dateformat'),
@@ -64,29 +64,33 @@ module.exports      = function(app){
 
   });
 
-  app.post('/api/chgpass', function(req, res){
-    var id        = req.body.id;
-    var opass     = req.body.oldpass;
-    var npass     = req.body.newpass;
-    chgpass.cpass(id, opass, npass, function(found){
+  app.post('/api/change_password', function(req, res){
+    var
+      token                  = req.body.token,
+      old_password           = req.body.old_password,
+      new_password           = req.body.new_password,
+      confirm_new_password   = req.body.confirm_new_password;
+    change_password.change_password(token, old_password, new_password, confirm_new_password, function(found){
       console.log(found);
       res.json(found);
     });
   });
 
-  app.post('/api/resetpass', function(req, res){
-    var email     = req.body.email;
-    chgpass.respass_init(email, function(found){
+  app.post('/api/reset-password', function(req, res){
+    var
+      email                 = req.body.email;
+    change_password.reset_password_init(email, function(found){
       console.log(found);
       res.json(found);
     });
   });
 
-  app.post('/api/resetpass/chg', function(req, res){
-    var email        = req.body.email;
-    var code        = req.body.code;
-    var npass        = req.body.newpass;
-    chgpass.respass_chg(email, code, npass, function(found){
+  app.post('/api/reset-password/change', function(req, res){
+    var
+      email                 = req.body.email,
+      code                  = req.body.code,
+      new_password          = req.body.new_password;
+    change_password.reset_password_change(email, code, new_password, function(found){
       console.log(found);
       res.json(found);
     });
@@ -114,10 +118,9 @@ module.exports      = function(app){
 
   app.put('/user', function(req, res){
     req.checkHeaders("token", "Token is missing.").notEmpty();
-    req.checkBody("display_name", "Enter a display name.").notEmpty();
-    req.checkBody("mood", "Enter a status mood.").notEmpty();
-    req.checkBody("phone_no", "Enter a valid phone no.").notEmpty();
-    req.checkBody("dob", "Enter valid date of birth.").isValidDob();
+    req.checkBody("type", "Update type is missing or invalid.").isIn(['display_name', 'mood', 'phone_no']);
+
+
 
     var errors = req.validationErrors();
     if (errors) {
@@ -125,16 +128,26 @@ module.exports      = function(app){
       return;
     } else {
       var
-        display_name            = req.body.display_name,
-        mood                    = req.body.mood;
-        phone_no                = req.body.phone_no,
-        dob                     = req.body.dob,
-        token                   = req.headers.token;
+        type                    = req.body.type;
 
-      user_controller.update(token, display_name, phone_no, dob, mood, function(found){
-        console.log(found);
-        res.json(found);
-      });
+      req.checkBody(type, "Missing").notEmpty();
+
+      var errors = req.validationErrors();
+      if (errors) {
+        res.send({status: 'error', errors: errors});
+        return;
+      } else {
+        var
+          value                   = req.body[type];
+          token                   = req.headers.token;
+
+        user_controller.update(token, type, value, function(found){
+          console.log(found);
+          res.json(found);
+        });
+      }
+
+
     }
 
 

@@ -36,14 +36,11 @@ exports.create = function(email, password, gender, callback){
 
 };
 
-exports.update = function(token, display_name, phone_no, dob, mood, callback){
+exports.update = function(token, type, value, callback){
   user.findOne({token: token}, function(err, user){
 
     if(user){
-      user.display_name         = display_name;
-      user.phone_no             = phone_no;
-      user.mood                 = mood;
-      user.dob                  = dob;
+      user[type]         = value;
       user.save();
       callback({status: 'success', msg: 'User updated.', user: {
         email: user.email,
