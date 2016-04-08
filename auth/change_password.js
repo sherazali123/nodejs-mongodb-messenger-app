@@ -66,7 +66,7 @@ exports.reset_password_init = function(email, callback) {
         // setup e-mail data with unicode symbols
         var mailOptions = {
             from: '"Messenger 👥" <messenger.test420@gmail.com>', // sender address
-            to: 'sheraz.ali342@gmail.com', // list of receivers
+            to: email, // list of receivers
             subject: 'Messenger: Verification Code ✔', // Subject line
             text: "Hello " + email + ".  Code to reset your Password is " + temp + ".",
         };
