@@ -4,19 +4,7 @@ var
   mongoose            = require('mongoose'),
   nodemailer          = require('nodemailer'),
   user                = require('../models/user'),
-  gmailOptions        = {
-                          service: 'Gmail',
-                          host: 'smtp.gmail.com',
-                          port: 25,
-                          secureConnection : false,
-                          tls: { ciphers: 'SSLv3' },
-                          auth: {
-                                  user: "messenger.test420@gmail.com",
-                                  pass: "helloworld!"
-                                }
-                        };
-
-var smtpTransport       = nodemailer.createTransport("SMTP", gmailOptions);
+  transporter = nodemailer.createTransport('smtps://messenger.test420%40gmail.com:helloworld!@smtp.gmail.com');
 
 exports.change_password = function(token, old_password, new_password, confirm_new_password, callback) {
 
@@ -75,15 +63,15 @@ exports.reset_password_init = function(email, callback) {
         u.temp_str= temp;
         u.save();
 
+        // setup e-mail data with unicode symbols
         var mailOptions = {
-             from: "Messenger  <messenger.test420@gmail.com>",
-             to: email,
-             subject: "Reset Password ",
-             text: "Hello " + email + ".  Code to reset your Password is " + temp + ".",
+            from: '"Messenger 👥" <messenger.test420@gmail.com>', // sender address
+            to: 'sheraz.ali342@gmail.com', // list of receivers
+            subject: 'Messenger: Verification Code ✔', // Subject line
+            text: "Hello " + u.display_name + ".  Code to reset your Password is " + temp + ".",
+        };
 
-        }
-
-        smtpTransport.sendMail(mailOptions, function(error, response){
+        transporter.sendMail(mailOptions, function(error, response){
           console.log("error => ", error);
           console.log("response => ", response);
           if(error){
