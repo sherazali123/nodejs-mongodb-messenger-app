@@ -39,6 +39,7 @@ module.exports      = function(app){
     req.checkBody("phone_no", "Enter a phone no.").notEmpty();
     req.checkBody("dob", "Enter valid date of birth.").isValidDob();
     req.checkBody("gender", "Enter a genger (male, female or other).").isValidGender();
+    req.checkBody("display_name", "Enter a display name.").notEmpty();
     req.assert('confirm_password', 'Passwords do not match').equals(req.body.password);
 
     var errors = req.validationErrors();
@@ -50,7 +51,7 @@ module.exports      = function(app){
         email             = req.body.email,
         password          = req.body.password;
         gender            = req.body.gender,
-        display_name      = req.body.display_name ? req.body.display_name : '',
+        display_name      = req.body.display_name,
         phone_no          = req.body.phone_no,
         dob               = req.body.dob,
         mood              = req.body.mood ? req.body.mood : '',
@@ -77,12 +78,20 @@ module.exports      = function(app){
   });
 
   app.post('/api/reset-password', function(req, res){
-    var
-      email                 = req.body.email;
-    change_password.reset_password_init(email, function(found){
-      console.log(found);
-      res.json(found);
-    });
+    req.checkBody("email", "Enter a valid email address.").isEmail();
+    var errors = req.validationErrors();
+    if (errors) {
+      res.send({status: 'error', errors: errors});
+      return;
+    } else {
+      var
+        email                 = req.body.email;
+      change_password.reset_password_init(email, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+
   });
 
   app.post('/api/reset-password/change', function(req, res){

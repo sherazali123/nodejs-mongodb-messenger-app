@@ -3,14 +3,20 @@ var
   rand                = require('csprng'),
   mongoose            = require('mongoose'),
   nodemailer          = require('nodemailer'),
-  user                = require('../models/user');
+  user                = require('../models/user'),
+  gmailOptions        = {
+                          service: 'Gmail',
+                          host: 'smtp.gmail.com',
+                          port: 25,
+                          secureConnection : false,
+                          tls: { ciphers: 'SSLv3' },
+                          auth: {
+                                  user: "messenger.test420@gmail.com",
+                                  pass: "helloworld!"
+                                }
+                        };
 
-var smtpTransport       = nodemailer.createTransport("SMTP", {
-     auth: {
-            user: "user@gmail.com",
-            pass: "********"
-          }
-});
+var smtpTransport       = nodemailer.createTransport("SMTP", gmailOptions);
 
 exports.change_password = function(token, old_password, new_password, confirm_new_password, callback) {
 
@@ -70,14 +76,16 @@ exports.reset_password_init = function(email, callback) {
         u.save();
 
         var mailOptions = {
-             from: "Raj Amal  <raj.amalw@gmail.com>",
+             from: "Messenger  <messenger.test420@gmail.com>",
              to: email,
              subject: "Reset Password ",
-             text: "Hello " + email + ".  Code to reset your Password is " + temp + ".nnRegards,nRaj Amal,nLearn2Crack Team.",
+             text: "Hello " + email + ".  Code to reset your Password is " + temp + ".",
 
         }
 
         smtpTransport.sendMail(mailOptions, function(error, response){
+          console.log("error => ", error);
+          console.log("response => ", response);
           if(error){
             callback({status: 'error', errors: [{
                 param: "email",
