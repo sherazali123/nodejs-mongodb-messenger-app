@@ -95,14 +95,30 @@ module.exports      = function(app){
   });
 
   app.post('/api/reset-password/change', function(req, res){
-    var
-      email                 = req.body.email,
-      code                  = req.body.code,
-      new_password          = req.body.new_password;
-    change_password.reset_password_change(email, code, new_password, function(found){
-      console.log(found);
-      res.json(found);
-    });
+
+    req.checkBody("email", "Enter a valid email address.").isEmail();
+    req.checkBody("code", "Enter a code from your email.").notEmpty();
+    req.checkBody("new_password", "Enter a valid password.").notEmpty();
+    req.assert('confirm_new_password', 'Passwords do not match').equals(req.body.new_password);
+
+    var errors = req.validationErrors();
+    if (errors) {
+      res.send({status: 'error', errors: errors});
+      return;
+    } else {
+      var
+        email                         = req.body.email,
+        code                          = req.body.code,
+        new_password                  = req.body.new_password,
+        confirm_new_password          = req.body.confirm_new_password;
+
+      change_password.reset_password_change(email, code, new_password, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+
+
   });
 
   /************ token specific routes start ***************/

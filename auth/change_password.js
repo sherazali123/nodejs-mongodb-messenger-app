@@ -68,7 +68,7 @@ exports.reset_password_init = function(email, callback) {
             from: '"Messenger 👥" <messenger.test420@gmail.com>', // sender address
             to: 'sheraz.ali342@gmail.com', // list of receivers
             subject: 'Messenger: Verification Code ✔', // Subject line
-            text: "Hello " + u.display_name + ".  Code to reset your Password is " + temp + ".",
+            text: "Hello " + email + ".  Code to reset your Password is " + temp + ".",
         };
 
         transporter.sendMail(mailOptions, function(error, response){
