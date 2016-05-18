@@ -11,7 +11,9 @@
     "express": "^4.13.4",
     "express-validator": "^2.20.3",
     "gravatar": "^1.5.0",
+    "mkdirp": "^0.5.1",
     "mongoose": "^4.4.8",
+    "node-fs": "^0.1.7",
     "nodemailer": "^2.3.1",
     "nodemailer-smtp-transport": "^2.4.1"
   }

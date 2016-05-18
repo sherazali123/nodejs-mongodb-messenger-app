@@ -72,8 +72,6 @@ exports.reset_password_init = function(email, callback) {
         };
 
         transporter.sendMail(mailOptions, function(error, response){
-          console.log("error => ", error);
-          console.log("response => ", response);
           if(error){
             callback({status: 'error', errors: [{
                 param: "email",

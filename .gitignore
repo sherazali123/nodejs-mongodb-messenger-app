@@ -36,3 +36,5 @@ node_modules
 
 // ignore documentation file
 APIs_DOC.txt
+
+public/uploads/posts/*
