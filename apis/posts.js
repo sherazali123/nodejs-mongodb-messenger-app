@@ -8,8 +8,32 @@ var
 exports.show = function(token, id, callback){
 
 };
-exports.index = function(token, callback){
+exports.index = function(token, page, page_size, callback){
+  page               = parseInt(page <= 0 || page === undefined ? 0 : page - 1);
+  page_size          = parseInt(page_size < 0 || page_size === undefined ? 10 : page_size);
 
+  user.findOne({token: token}, function(err, user){
+    if(user){
+      var
+        user_id            = user._id;
+
+        console.log("page*page_size => ", page*page_size);
+        console.log("page => ",  page);
+        console.log("page_size => ",  page_size);
+      post.find({user_id: user_id}, function(err, posts){
+        callback({status: 'success', msg: 'List of posts', posts: posts
+      });
+
+    }).skip(page*page_size).limit(page_size).sort('-created_on');
+    } else {
+      callback({status: 'error', errors: [{
+          param: 'token',
+          msg: "Invalid token",
+          value: token
+        }]
+      });
+    }
+  });
 };
 exports.create = function(token, base64, extention, price, description, status, callback){
   user.findOne({token: token}, function(err, user){

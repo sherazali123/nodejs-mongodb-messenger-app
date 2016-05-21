@@ -189,6 +189,29 @@ module.exports      = function(app, express){
 
   });
 
+  // post
+
+  app.get('/post', function(req, res){
+    req.checkHeaders("token", "Token is missing.").notEmpty();
+    req.checkQuery("page", "Invalid page no.").isValidPageNo();
+    req.checkQuery("page_size", "Invalid page size.").isValidPageSize();
+
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        token                 = req.headers.token,
+        page                  = req.query.page,
+        page_size             = req.query.page_size;
+
+      post_controller.index(token, page, page_size, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+  });
+
   app.post('/post', function(req, res){
     req.checkHeaders("token", "Token is missing.").notEmpty();
     req.checkBody("base64", "Base 64 string is missing.").notEmpty();

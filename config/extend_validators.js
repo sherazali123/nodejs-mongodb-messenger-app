@@ -21,6 +21,22 @@ module.exports            = function(app, expressValidator){
         }
         return true;
       },
+      isValidPageNo: function(page){
+        page = page || 1;
+        page = parseInt(page);
+        if(isNaN(page)) return false;
+        if(typeof page !== "number") return false;
+        if(page < 1) return false;
+        return true;
+      },
+      isValidPageSize: function(size){
+        size = size || 0;
+        size = parseInt(size);
+        if(isNaN(size)) return false;
+        if(typeof size !== "number" || isNaN(size)) return false;
+        if(size < 0) return false;
+        return true;
+      }
     }
   }));
 
