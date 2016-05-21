@@ -16,10 +16,6 @@ exports.index = function(token, page, page_size, callback){
     if(user){
       var
         user_id            = user._id;
-
-        console.log("page*page_size => ", page*page_size);
-        console.log("page => ",  page);
-        console.log("page_size => ",  page_size);
       post.find({user_id: user_id}, function(err, posts){
         callback({status: 'success', msg: 'List of posts', posts: posts
       });
