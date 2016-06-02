@@ -9,12 +9,9 @@ module.exports            = function(app, expressValidator){
         var found = false;
         if(!token) found = false;
         // check if the token exists in user collection
-        console.log("found1",found);
         user.findOne({token: token, function(err, user){
           found = !user ? false : true;
-          console.log("found2",found);
         }});
-        console.log("found3",found);
         return found;
       },
       isValidGender: function(gender) {
