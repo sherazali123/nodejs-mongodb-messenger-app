@@ -5,15 +5,6 @@ module.exports            = function(app, expressValidator){
 
   app.use(expressValidator({
     customValidators: {
-      isValidAuthToken: function(token){
-        var found = false;
-        if(!token) found = false;
-        // check if the token exists in user collection
-        user.findOne({token: token, function(err, user){
-          found = !user ? false : true;
-        }});
-        return found;
-      },
       isValidGender: function(gender) {
         if(['male', 'female', 'other'].indexOf(gender) !== -1){
           return true;
