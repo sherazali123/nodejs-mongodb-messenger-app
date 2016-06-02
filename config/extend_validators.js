@@ -1,8 +1,22 @@
+var
+  user                    = require('../models/user');
 // extend express validator
 module.exports            = function(app, expressValidator){
 
   app.use(expressValidator({
     customValidators: {
+      isValidAuthToken: function(token){
+        var found = false;
+        if(!token) found = false;
+        // check if the token exists in user collection
+        console.log("found1",found);
+        user.findOne({token: token, function(err, user){
+          found = !user ? false : true;
+          console.log("found2",found);
+        }});
+        console.log("found3",found);
+        return found;
+      },
       isValidGender: function(gender) {
         if(['male', 'female', 'other'].indexOf(gender) !== -1){
           return true;

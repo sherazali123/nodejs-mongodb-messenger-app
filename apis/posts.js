@@ -77,6 +77,7 @@ exports.create = function(token, base64, extention, price, description, status, 
           // save new post to the database
           newpost.save(function(err){
             callback({status: 'success', msg: 'Successfully Registered', post: {
+              _id: newpost._id,
               image_name: newpost.image_name,
               image_path: '/static/uploads/posts/' + user_id + '/' + newpost.image_name,
               price: newpost.price,

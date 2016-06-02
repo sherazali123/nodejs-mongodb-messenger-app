@@ -1,6 +1,8 @@
 var
     mongoose        = require('mongoose'),
-    Schema          = mongoose.Schema;
+    Schema          = mongoose.Schema,
+    // https://www.npmjs.com/package/mongoose-validator
+    validate        = require('mongoose-validator');
 
 var userSchema      = mongoose.Schema({
   token: String,

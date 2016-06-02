@@ -4,7 +4,9 @@ var
   login                   = require('../auth/login'),
   dateFormat              = require('dateformat'),
   user_controller         = require('../apis/users'),
-  post_controller         = require('../apis/posts');
+  post_controller         = require('../apis/posts'),
+  post_like_controller    = require('../apis/post_likes'),
+  post_comment_controller = require('../apis/post_comments');
 
 
 module.exports      = function(app, express){
@@ -192,7 +194,7 @@ module.exports      = function(app, express){
   // post
 
   app.get('/post', function(req, res){
-    req.checkHeaders("token", "Token is missing.").notEmpty();
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
     req.checkQuery("page", "Invalid page no.").isValidPageNo();
     req.checkQuery("page_size", "Invalid page size.").isValidPageSize();
 
@@ -213,7 +215,7 @@ module.exports      = function(app, express){
   });
 
   app.post('/post', function(req, res){
-    req.checkHeaders("token", "Token is missing.").notEmpty();
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
     req.checkBody("base64", "Base 64 string is missing.").notEmpty();
     req.checkBody("extention", "Image extention is missing").isIn(['png','jpeg', 'jpg', 'gif', 'PNG', 'JPEG', 'JPG', 'GIF']);
     req.checkBody("price", "Price is missing or invalid value").isNumeric();
@@ -239,6 +241,91 @@ module.exports      = function(app, express){
       });
 
     }
+  });
+
+  // post likes
+
+  app.post('/post/like', function(req, res){
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    req.checkBody("is_liked", "is_liked is missing.").isIn([0,1, false, true]);
+    req.checkBody("post_id", "Post id is missing").notEmpty();
+
+    var errors = req.validationErrors();
+
+    if(errors){
+      res.send({status: 'error', errors: errors});return;
+    } else {
+      var
+        token                 = req.headers.token,
+        is_liked              = req.body.is_liked,
+        post_id               = req.body.post_id,
+        status                = 1;
+      // convert is_like to Boolean
+      is_liked = Boolean(is_liked);
+      // create post
+      post_like_controller.create(token, is_liked, post_id, status, function(found){
+        console.log(found);
+        res.json(found);
+      });
+
+    }
+
+  });
+
+  // post comments
+  // create comment
+  app.post('/post/comment', function(req, res){
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    req.checkBody("comment", "Comment is missing.").notEmpty();
+    req.checkBody("post_id", "Post id is missing").notEmpty();
+
+    var errors = req.validationErrors();
+
+    if(errors){
+      res.send({status: 'error', errors: errors});return;
+    } else {
+      var
+        token                 = req.headers.token,
+        comment               = req.body.comment,
+        post_id               = req.body.post_id,
+        status                = 1;
+      // create post
+      post_comment_controller.create(token, comment, post_id, status, function(found){
+        console.log(found);
+        res.json(found);
+      });
+
+    }
+
+  });
+
+  // update comment
+  app.put('/post/comment', function(req, res){
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    req.checkBody("post_comment_id", "Post comment id is missing").notEmpty();
+    req.checkBody("comment", "Comment is missing.").notEmpty();
+    req.checkBody("post_id", "Post id is missing").notEmpty();
+
+
+    var errors = req.validationErrors();
+
+    if(errors){
+      res.send({status: 'error', errors: errors});return;
+    } else {
+      var
+        token                 = req.headers.token,
+        comment               = req.body.comment,
+        post_id               = req.body.post_id,
+        post_comment_id       = req.body.post_comment_id,
+        status                = 1;
+      // create post
+      post_comment_controller.update(token, comment, post_id, post_comment_id, status, function(found){
+        console.log(found);
+        res.json(found);
+      });
+
+    }
+
   });
 
   /************ token specific routes end ****************/

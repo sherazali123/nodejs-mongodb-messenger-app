@@ -2,7 +2,9 @@ var
   mongoose          = require('mongoose'),
   // userSchema
   user              = require('./user'),
-  Schema            = mongoose.Schema;
+  Schema            = mongoose.Schema,
+  // https://www.npmjs.com/package/mongoose-validator
+  validate          = require('mongoose-validator');
 
 var postSchema      = mongoose.Schema({
   price: Number,
