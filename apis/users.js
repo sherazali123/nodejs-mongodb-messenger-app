@@ -14,7 +14,8 @@ exports.show = function(token, callback){
         phone_no: user.phone_no,
         dob: dateFormat(user.dob, "yyyy/mm/dd"),
         mood: user.mood,
-        status: user.status
+        status: user.status,
+        post_comments : [{ type: Schema.Types.ObjectId, ref: 'post_comments' }]
       }});
     } else {
       callback({status: 'error', errors: [{

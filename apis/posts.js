@@ -43,7 +43,6 @@ exports.create = function(token, base64, extention, price, description, status, 
 
       mkdirp(directory, function(err) {
         // path exists unless there was an error
-        console.log("Directory err => ", err);
         if(err){
           callback({status: 'error', errors: [{
               param: 'directory',
@@ -76,15 +75,11 @@ exports.create = function(token, base64, extention, price, description, status, 
 
           // save new post to the database
           newpost.save(function(err){
-            callback({status: 'success', msg: 'Successfully Registered', post: {
-              _id: newpost._id,
-              image_name: newpost.image_name,
-              image_path: '/static/uploads/posts/' + user_id + '/' + newpost.image_name,
-              price: newpost.price,
-              description: newpost.description,
-              status: newpost.status,
-              user_id: newpost.user_id
-            }});
+            callback({
+              status: 'success',
+              msg: 'Successfully Registered',
+              post: newpost
+            });
           });
         }
       });

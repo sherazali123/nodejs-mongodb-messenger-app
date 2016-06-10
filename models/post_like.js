@@ -10,11 +10,14 @@ var
 
 var postLikeSchema    = mongoose.Schema({
     is_liked: Boolean,
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-    post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'post' },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
+    post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'posts' },
     status: Number,
     created_on: { type: Date, default: Date.now },
     updated_on: { type: Date, default: Date.now}
+}, {
+  toObject: { virtuals: true},
+  toJSON: { virtuals: true }
 });
 
 // collection

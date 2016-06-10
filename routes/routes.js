@@ -16,7 +16,7 @@ var
   // post comment actions
   post_comment_controller = require('../apis/post_comments');
 
-// exporting all the end points into the application 
+// exporting all the end points into the application
 module.exports      = function(app, express){
   // fake the url by /static which is pointing to the directory public
   app.use('/static', express.static('public'));
@@ -300,6 +300,40 @@ module.exports      = function(app, express){
       });
 
     }
+
+  });
+
+  // get post commets
+
+  app.get('/post/comment/:post_id', function(req, res){
+    // token from the header represents the user
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    // the post id by a certain user
+    req.checkParams("post_id", "Post id is missing").notEmpty();
+    req.checkQuery("page", "Invalid page no.").isValidPageNo();
+    req.checkQuery("page_size", "Invalid page size.").isValidPageSize();
+
+    var errors = req.validationErrors();
+
+    if(errors){
+      // return errors as array if request is not correct or complete
+      res.send({status: 'error', errors: errors});return;
+    } else {
+      var
+        // token from the header represents the user
+        token                 = req.headers.token,
+        // the post id by a certain user
+        post_id               = req.params.post_id,
+        page                  = req.query.page,
+        page_size             = req.query.page_size;
+      // create post
+      post_comment_controller.index(token, post_id, page, page_size, function(found){
+        console.log(found);
+        res.json(found);
+      });
+
+    }
+
 
   });
 

@@ -16,6 +16,16 @@ var userSchema      = mongoose.Schema({
   dob: { type: Date, default: Date.now },
   phone_no: String,
   mood: String
+},{
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true }
+});
+
+userSchema.virtual('avatar').get(function () {
+  if(this.gender === 'male'){
+    return '/static/images/male.png';
+  }
+  return '/static/images/female.png';
 });
 
 // connect with DB

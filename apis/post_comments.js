@@ -9,11 +9,51 @@ exports.show  = function(token, id, callback){
 
 };
 
-exports.index  = function(token, id, callback){
-  user_model.findOne({token: token}, function(err, user){
+exports.index  = function(token, post_id, page, page_size, callback){
+  page               = parseInt(page <= 0 || page === undefined ? 0 : page - 1);
+  page_size          = parseInt(page_size < 0 || page_size === undefined ? 10 : page_size);
+
+  user_model
+  .findOne({token: token}, function(err, user){
     if(user){
       var
         user_id            = user._id;
+      post_model
+      .findOne({_id: post_id}, function(err, post){
+        if(post){
+            post_comment_model
+            .find({post_id: post_id})
+            .skip(page*page_size)
+            .limit(page_size)
+            .sort('-created_on')
+            .populate({path: 'user_id', select: '-hashed_password -salt'})
+            .populate('post_id')
+            .exec(err, function(err, post_comments){
+              if(post_comments){
+                callback({
+                  status: 'success',
+                  msg: 'List of post comments',
+                  post: post,
+                  post_comments: post_comments,
+                });
+              } else {
+                callback({
+                  status: 'success',
+                  msg: 'List of post comments',
+                  post: post,
+                  post_comments: [],
+                });
+              }
+          });
+        } else {
+          callback({status: 'error', errors: [{
+              param: 'post_id',
+              msg: "Invalid post id",
+              value: post_id
+            }]
+          });
+        }
+      });
 
     } else {
       callback({status: 'error', errors: [{

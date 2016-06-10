@@ -29,7 +29,8 @@ exports.login = function(email,password,callback) {
           phone_no: users[0].phone_no,
           dob: dateFormat(users[0].dob, "yyyy/mm/dd"),
           mood: users[0].mood,
-          status: users[0].status
+          status: users[0].status,
+          avatar: users[0].avatar
         }});
       } else {
         callback({status: 'error', errors: [{
