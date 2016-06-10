@@ -16,11 +16,16 @@ exports.index = function(token, page, page_size, callback){
     if(user){
       var
         user_id            = user._id;
-      post.find({user_id: user_id}, function(err, posts){
-        callback({status: 'success', msg: 'List of posts', posts: posts
+      post
+      .find({user_id: user_id})
+      .skip(page*page_size)
+      .limit(page_size)
+      .sort('-created_on')
+      .populate({path: 'user_id', select: '-hashed_password -salt'})
+      .exec(function(err, posts){
+          callback({status: 'success', msg: 'List of posts', posts: posts
+        });
       });
-
-    }).skip(page*page_size).limit(page_size).sort('-created_on');
     } else {
       callback({status: 'error', errors: [{
           param: 'token',
