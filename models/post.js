@@ -23,7 +23,7 @@ var postSchema      = mongoose.Schema({
 postSchema
 .virtual('image_url')
 .get(function(){
-  return '/static/uploads/posts/' + this.user_id + '/' + this.image_name;
+  return '/static/uploads/posts/' + this.user_id._id + '/' + this.image_name;
 });
 
 // connect with DB
