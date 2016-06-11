@@ -23,7 +23,10 @@ exports.index = function(token, page, page_size, callback){
       .sort('-created_on')
       .populate({path: 'user_id', select: '-hashed_password -salt -token'})
       .exec(function(err, posts){
-          callback({status: 'success', msg: 'List of posts', posts: posts
+          callback({
+            status: 'success',
+            msg: 'List of posts',
+            posts: posts
         });
       });
     } else {
