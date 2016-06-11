@@ -26,7 +26,7 @@ exports.index  = function(token, post_id, page, page_size, callback){
             .skip(page*page_size)
             .limit(page_size)
             .sort('-created_on')
-            .populate({path: 'user_id', select: '-hashed_password -salt'})
+            .populate({path: 'user_id', select: '-hashed_password -salt -token'})
             .populate('post_id')
             .exec(err, function(err, post_comments){
               if(post_comments){
@@ -74,7 +74,10 @@ exports.create  = function(token, comment, post_id, status, callback){
       var
         user_id            = user._id;
       // find the post which is being commented from the post id
-      post_model.findOne({_id: post_id}, function(err, post){
+      post_model
+      .findOne({_id: post_id})
+      .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+      .exec(function(err, post){
         if(post){
 
           var newpostcomment = new post_comment_model({
@@ -85,30 +88,26 @@ exports.create  = function(token, comment, post_id, status, callback){
                 });
 
             // save the post_comment and send success message if no error found while saving it
-            newpostcomment.save(function(err){
+            newpostcomment.save(function(err, newpostcomment){
               if(!err){
-                callback({
-                  status: 'success',
-                  msg: "Successfully commented.",
-                  // the current post
-                  post: {
-                    _id: post_id,
-                    image_name: post.image_name,
-                    image_path: '/static/uploads/posts/' + user_id + '/' + post.image_name,
-                    price: post.price,
-                    description: post.description,
-                    status: post.status,
-                    user_id: post.user_id
-                  },
-                  // the current post_like
-                  post_comment: {
-                    _id: newpostcomment._id,
-                    comment: newpostcomment.comment,
-                    post_id: newpostcomment.post_id,
-                    user_id: newpostcomment.user_id,
-                    status: newpostcomment.status,
-                  }
+                console.log("****", newpostcomment);
+                post_comment_model
+                .findOne({_id: newpostcomment._id})
+                .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+                .populate({path: 'post_id'})
+                .exec(function(err, newpostcomment){
+
+                  callback({
+                    status: 'success',
+                    msg: "Successfully commented.",
+                    // the current post
+                    post: post,
+                    // the current post_like
+                    post_comment: newpostcomment
+                  });
                 });
+
+
               } else {
                 // if post_like validation failed while saving it. log the err for more details
                 callback({status: 'error', errors: [{
@@ -152,36 +151,29 @@ exports.update  = function(token, comment, post_id, post_comment_id, status, cal
       var
         user_id            = user._id;
       // find the post which is being commented from the post id
-      post_model.findOne({_id: post_id}, function(err, post){
+      post_model
+      .findOne({_id: post_id})
+      .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+      .exec(function(err, post){
         if(post){
-
-          post_comment_model.findOne({_id: post_comment_id}, function(err, post_comment){
+          post_comment_model
+          .findOne({_id: post_comment_id})
+          .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+          .populate({path: 'post_id'})
+          .exec(function(err, post_comment){
             if(post_comment){
               post_comment.comment = comment;
               post_comment.updated_on = new Date();
               post_comment.save(function(err){
                 if(!err){
+
                   callback({
                     status: 'success',
                     msg: "Successfully comment updated.",
                     // the current post
-                    post: {
-                      _id: post_id,
-                      image_name: post.image_name,
-                      image_path: '/static/uploads/posts/' + user_id + '/' + post.image_name,
-                      price: post.price,
-                      description: post.description,
-                      status: post.status,
-                      user_id: post.user_id
-                    },
+                    post: post,
                     // the current post_like
-                    post_comment: {
-                      _id: post_comment._id,
-                      comment: post_comment.comment,
-                      post_id: post_comment.post_id,
-                      user_id: post_comment.user_id,
-                      status: post_comment.status,
-                    }
+                    post_comment: post_comment
                   });
                 } else {
                   // if post_comment validation failed while saving it. log the err for more details
@@ -192,7 +184,7 @@ exports.update  = function(token, comment, post_id, post_comment_id, status, cal
                     }]
                   });
                 }
-              })
+              });
             } else {
               callback({status: 'error', errors: [{
                   param: 'post_comment_id',

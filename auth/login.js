@@ -4,11 +4,11 @@ var
   mongoose      = require('mongoose'),
   gravatar      = require('gravatar'),
   dateFormat    = require('dateformat'),
-  user          = require('../models/user');
+  user_model          = require('../models/user');
 
 exports.login = function(email,password,callback) {
 
-  user.find({email: email}, function(err ,users){
+  user_model.find({email: email}, function(err ,users){
 
     if(users.length !== 0){
 

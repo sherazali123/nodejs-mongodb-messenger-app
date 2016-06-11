@@ -2,7 +2,7 @@ var
   crypto      = require('crypto'),
   rand        = require('csprng'),
   mongoose    = require('mongoose'),
-  user        = require('../models/user'),
+  user_model        = require('../models/user'),
   dateFormat  = require('dateformat');
 
 exports.register = function(email, password, gender, display_name, phone_no, dob, mood, status, callback){
@@ -15,7 +15,7 @@ exports.register = function(email, password, gender, display_name, phone_no, dob
     token             = crypto.createHash('sha512').update(email +rand).digest("hex"),
     hashed_password   = crypto.createHash('sha512').update(newpass).digest("hex"),
     // create user instance from userSchema to register new user
-    newuser           = new user({
+    newuser           = new user_model({
      token: token,
      email: email,
      hashed_password: hashed_password,
@@ -28,7 +28,7 @@ exports.register = function(email, password, gender, display_name, phone_no, dob
      status: status
     });
   // find if email already exists
-  user.find({email: email},function(err,users){
+  user_model.find({email: email},function(err,users){
     var
       // number of users found with the given email
       len = users.length;
@@ -43,7 +43,8 @@ exports.register = function(email, password, gender, display_name, phone_no, dob
           phone_no: newuser.phone_no,
           dob: dateFormat(newuser.dob, "yyyy/mm/dd"),
           mood: newuser.mood,
-          status: newuser.status
+          status: newuser.status,
+          avatar: newuser.avatar
         }});
       });
     } else {

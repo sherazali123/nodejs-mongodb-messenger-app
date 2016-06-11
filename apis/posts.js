@@ -1,6 +1,6 @@
 var
-  user          = require('../models/user'),
-  post          = require('../models/post'),
+  user_model    = require('../models/user'),
+  post_model          = require('../models/post'),
   functions     = require('../helpers/functions'),
   mkdirp        = require('mkdirp'),
   fs            = require('fs');
@@ -12,16 +12,16 @@ exports.index = function(token, page, page_size, callback){
   page               = parseInt(page <= 0 || page === undefined ? 0 : page - 1);
   page_size          = parseInt(page_size < 0 || page_size === undefined ? 10 : page_size);
 
-  user.findOne({token: token}, function(err, user){
+  user_model.findOne({token: token}, function(err, user){
     if(user){
       var
         user_id            = user._id;
-      post
+      post_model
       .find({user_id: user_id})
       .skip(page*page_size)
       .limit(page_size)
       .sort('-created_on')
-      .populate({path: 'user_id', select: '-hashed_password -salt'})
+      .populate({path: 'user_id', select: '-hashed_password -salt -token'})
       .exec(function(err, posts){
           callback({status: 'success', msg: 'List of posts', posts: posts
         });
@@ -37,7 +37,7 @@ exports.index = function(token, page, page_size, callback){
   });
 };
 exports.create = function(token, base64, extention, price, description, status, callback){
-  user.findOne({token: token}, function(err, user){
+  user_model.findOne({token: token}, function(err, user){
     if(user){
       var
         user_id             = user._id,
@@ -70,7 +70,7 @@ exports.create = function(token, base64, extention, price, description, status, 
 
           var
             // create new post instance from postSchema to create new post of user
-            newpost             = new post({
+            newpost             = new post_model({
               image_name: image_name,
               price: price,
               description: description,
@@ -79,19 +79,30 @@ exports.create = function(token, base64, extention, price, description, status, 
             });
 
           // save new post to the database
-          newpost.save(function(err){
-            callback({
-              status: 'success',
-              msg: 'Successfully Registered',
-              post: newpost
-            });
+          newpost.save(function(err, newpost){
+            if(!err){
+              post_model
+              .findOne({_id: newpost._id})
+              .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+              .exec(function(err, newpost){
+                callback({
+                  status: 'success',
+                  msg: 'Successfully posted.',
+                  post: newpost
+                });
+              });
+            } else {
+              callback({status: 'error', errors: [{
+                  param: 'newpost',
+                  msg: "Error! while saving post. Try again.",
+                  value: token
+                }]
+              });
+            }
+
           });
         }
       });
-
-
-
-
     } else {
       callback({status: 'error', errors: [{
           param: 'token',

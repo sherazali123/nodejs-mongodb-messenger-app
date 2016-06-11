@@ -33,10 +33,17 @@ exports.create  = function(token, is_liked, post_id, status, callback){
       var
         user_id            = user._id;
       // find the post which is being liked or disliked from the post id
-      post_model.findOne({_id: post_id}, function(err, post){
+      post_model
+      .findOne({_id: post_id})
+      .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+      .exec(function(err, post){
         if(post){
           // find the post like from the user_id and post_id
-          post_like_model.findOne({user_id: user_id, post_id: post_id}, function(err, post_like){
+          post_like_model
+          .findOne({user_id: user_id, post_id: post_id})
+          .populate({path: 'user_id', select: '-hashed_password -salt - token'})
+          .populate({path: 'post_id'})
+          .exec(function(err, post_like){
             // update the post_like if user has already liked or disliked the post
             if(post_like){
               post_like.is_liked = is_liked;
@@ -52,30 +59,21 @@ exports.create  = function(token, is_liked, post_id, status, callback){
               });
             }
             // save the post_like and send success message if no error found while saving it
-            post_like.save(function(err){
+            post_like.save(function(err, post_like){
               if(!err){
-                console.log("is_liked => ", is_liked);
-                callback({
-                  status: 'success',
-                  msg: (is_liked === true ? 'Liked' : 'Disliked'),
-                  // the current post
-                  post: {
-                    _id: post_id,
-                    image_name: post.image_name,
-                    image_path: '/static/uploads/posts/' + user_id + '/' + post.image_name,
-                    price: post.price,
-                    description: post.description,
-                    status: post.status,
-                    user_id: post.user_id
-                  },
-                  // the current post_like
-                  post_like: {
-                    _id: post_like._id,
-                    is_liked: post_like.is_liked,
-                    post_id: post_like.post_id,
-                    user_id: post_like.user_id,
-                    status: post_like.status,
-                  }
+                post_like_model
+                .findOne({_id: post_like._id})
+                .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+                .populate({path: 'post_id'})
+                .exec(function(err, post_like){
+                  callback({
+                    status: 'success',
+                    msg: (is_liked === true ? 'Liked' : 'Disliked'),
+                    // the current post
+                    post: post,
+                    // the current post_like
+                    post_like: post_like
+                  });
                 });
               } else {
                 // if post_like validation failed while saving it. log the err for more details

@@ -1,9 +1,9 @@
 var
-  user            = require('../models/user'),
-  dateFormat      = require('dateformat');
+  user_model            = require('../models/user'),
+  dateFormat            = require('dateformat');
 
 exports.show = function(token, callback){
-  user.findOne({token: token}, function(err, user){
+  user_model.findOne({token: token}, function(err, user){
 
     if(user){
       callback({status: 'success', msg: 'User found.', user: {
@@ -15,7 +15,7 @@ exports.show = function(token, callback){
         dob: dateFormat(user.dob, "yyyy/mm/dd"),
         mood: user.mood,
         status: user.status,
-        post_comments : [{ type: Schema.Types.ObjectId, ref: 'post_comments' }]
+        avatar: user.avatar
       }});
     } else {
       callback({status: 'error', errors: [{
@@ -38,7 +38,7 @@ exports.create = function(email, password, gender, callback){
 };
 
 exports.update = function(token, type, value, callback){
-  user.findOne({token: token}, function(err, user){
+  user_model.findOne({token: token}, function(err, user){
 
     if(user){
       user[type]         = value;
@@ -51,7 +51,8 @@ exports.update = function(token, type, value, callback){
         phone_no: user.phone_no,
         dob: dateFormat(user.dob, "yyyy/mm/dd"),
         mood: user.mood,
-        status: user.status
+        status: user.status,
+        avatar: user.avatar
       }});
     } else {
       callback({status: 'error', errors: [{
