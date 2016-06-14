@@ -1,9 +1,11 @@
 var
-  user_model    = require('../models/user'),
+  user_model          = require('../models/user'),
   post_model          = require('../models/post'),
-  functions     = require('../helpers/functions'),
-  mkdirp        = require('mkdirp'),
-  fs            = require('fs');
+  post_like_model     = require('../models/post_like'),
+  functions           = require('../helpers/functions'),
+  mkdirp              = require('mkdirp'),
+  async               = require('async'),
+  fs                  = require('fs');
 
 exports.show = function(token, id, callback){
 
@@ -23,11 +25,14 @@ exports.index = function(token, page, page_size, callback){
       .sort('-created_on')
       .populate({path: 'user_id', select: '-hashed_password -salt -token'})
       .exec(function(err, posts){
-          callback({
-            status: 'success',
-            msg: 'List of posts',
-            posts: posts
+
+        callback({
+          status: 'success',
+          msg: 'List of posts',
+          posts: posts,
         });
+
+
       });
     } else {
       callback({status: 'error', errors: [{

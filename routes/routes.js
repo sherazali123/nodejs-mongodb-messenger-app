@@ -14,7 +14,9 @@ var
   // post like actions
   post_like_controller    = require('../apis/post_likes'),
   // post comment actions
-  post_comment_controller = require('../apis/post_comments');
+  post_comment_controller = require('../apis/post_comments'),
+  // user follower/following actions
+  user_follower_controller = require('../apis/user_followers');
 
 // exporting all the end points into the application
 module.exports      = function(app, express){
@@ -213,6 +215,28 @@ module.exports      = function(app, express){
 
   });
 
+  // send the data of user (basic, follower, following, posts. likes etc)
+  app.get('/user-profile/:user_id', function(req, res){
+
+    req.checkHeaders("token", "Token is missing.").notEmpty();
+    req.checkParams("user_id", "user_id is missing").notEmpty();
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        token       = req.headers.token,
+        user_id     = req.params.user_id;
+
+      user_controller.user_profile(token, user_id, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+
+  });
+
+
   /************************ POST *************************/
 
   // An end point returns post properties by the post id
@@ -405,6 +429,40 @@ module.exports      = function(app, express){
         res.json(found);
       });
 
+    }
+
+  });
+  /*********************following/follower****************/
+  // follow or unfollow
+  app.post('/follow/:user_id', function(req, res){
+
+    req.checkHeaders("token", "Token is missing.").notEmpty();
+    req.checkParams("user_id", "user_id is missing").notEmpty();
+    req.checkBody("is_following", "is_following is missing").isIn([0,1]);
+
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        // who is going to follow or un follow
+        token           = req.headers.token,
+        // user who is going to be followed or unfollowed
+        user_id         = req.params.user_id,
+        // following or unfollowing?
+        is_following    = req.body.is_following,
+
+        status          = 1;
+      is_following = parseInt(is_following);
+      is_following = Boolean(is_following);
+
+      status = (is_following === false ? 0 : 1);
+
+      console.log("statusstatusstatusstatusstatus", status);
+      user_follower_controller.follow_or_unfollow(token, user_id, is_following, status, function(found){
+        console.log(found);
+        res.json(found);
+      });
     }
 
   });

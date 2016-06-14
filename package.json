@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "server.js",
   "dependencies": {
+    "async": "^2.0.0-rc.6",
     "body-parser": "^1.15.0",
     "connect": "^3.4.1",
     "crypto": "0.0.3",

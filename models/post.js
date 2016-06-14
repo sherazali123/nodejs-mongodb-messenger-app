@@ -22,18 +22,16 @@ var postSchema      = mongoose.Schema({
   toJSON: { virtuals: true }
 });
 
+
 postSchema
 .virtual('image_url')
 .get(function(){
   return '/static/uploads/posts/' + this.user_id._id + '/' + this.image_name;
 });
 
-postSchema
-.method('get_no_of_likes', function(cb){
-  post_like_model.find().count(function(err, count){
-    cb(count);
-  });
-});
+postSchema.methods.get_no_of_likes = function(cb){
+  return post_like_model.find({user_id: this.user_id, status: 1}).count(cb);
+};
 
 postSchema
 .virtual('no_of_comments')
