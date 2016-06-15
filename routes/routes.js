@@ -240,6 +240,26 @@ module.exports      = function(app, express){
   /************************ POST *************************/
 
   // An end point returns post properties by the post id
+  app.get('/post/:post_id', function(req, res){
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    req.checkParams("post_id", "Post id is missing").notEmpty();
+
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        token                 = req.headers.token,
+        post_id               = req.params.post_id;
+
+      post_controller.show(token, post_id, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+  });
+
+  // An end point returns posts list with all properties
   app.get('/post', function(req, res){
     req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
     req.checkQuery("page", "Invalid page no.").isValidPageNo();

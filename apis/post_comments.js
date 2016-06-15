@@ -22,7 +22,7 @@ exports.index  = function(token, post_id, page, page_size, callback){
       .findOne({_id: post_id}, function(err, post){
         if(post){
             post_comment_model
-            .find({post_id: post_id})
+            .find({post_id: post_id, status: 1})
             .skip(page*page_size)
             .limit(page_size)
             .sort('-created_on')

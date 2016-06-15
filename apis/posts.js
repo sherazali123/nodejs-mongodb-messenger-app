@@ -2,13 +2,72 @@ var
   user_model          = require('../models/user'),
   post_model          = require('../models/post'),
   post_like_model     = require('../models/post_like'),
+  post_comment_model  = require('../models/post_comment'),
   functions           = require('../helpers/functions'),
   mkdirp              = require('mkdirp'),
   async               = require('async'),
   fs                  = require('fs');
 
-exports.show = function(token, id, callback){
+exports.show = function(token, post_id, callback){
+  user_model.findOne({token: token}, function(err, user){
+    if(user){
+      var
+        user_id             = user._id;
+        post_data           = {};
+      post_model
+      .findOne({_id: post_id})
+      .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+      .exec(function(err1, post){
+        post_data.basic = post;
+        if(post){
+          post_comment_model
+          .find({post_id: post._id, status: 1})
+          .sort('-created_on')
+          .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+          .populate('post_id')
+          .exec(err, function(err, post_comments){
+            post_data.comments = {total_comments: post_comments.length, comments: post_comments};
 
+            post_like_model
+            .find({post_id: post._id, status: 1})
+            .sort('-created_on')
+            .populate({path: 'user_id', select: '-hashed_password -salt -token'})
+            .populate('post_id')
+            .exec(err, function(err, post_likes){
+              post_data.likes = {total_likes: post_likes.length, likes: post_likes};
+
+              post.is_liked(user_id, function(err, likes_counter){
+                post_data.likes.is_liked = (likes_counter > 0 ? 1 : 0);
+                callback({
+                  status: "success",
+                  msg: "Post information",
+                  post: post_data,
+                });
+              });
+
+            });
+
+
+          });
+        } else {
+          callback({status: 'error', errors: [{
+              param: 'post_id',
+              msg: "Invalid post_id",
+              value: post_id
+            }]
+          });
+        }
+      });
+
+    } else {
+      callback({status: 'error', errors: [{
+          param: 'token',
+          msg: "Invalid token",
+          value: token
+        }]
+      });
+    }
+  });
 };
 exports.index = function(token, page, page_size, callback){
   page               = parseInt(page <= 0 || page === undefined ? 0 : page - 1);
