@@ -458,7 +458,6 @@ module.exports      = function(app, express){
 
       status = (is_following === false ? 0 : 1);
 
-      console.log("statusstatusstatusstatusstatus", status);
       user_follower_controller.follow_or_unfollow(token, user_id, is_following, status, function(found){
         console.log(found);
         res.json(found);

@@ -22,22 +22,26 @@ var postSchema      = mongoose.Schema({
   toJSON: { virtuals: true }
 });
 
-
+// make post imeage url using virtual properties
 postSchema
 .virtual('image_url')
 .get(function(){
   return '/static/uploads/posts/' + this.user_id._id + '/' + this.image_name;
 });
 
+// returing total no of likes for the post as a callback
 postSchema.methods.get_no_of_likes = function(cb){
-  return post_like_model.find({user_id: this.user_id, status: 1}).count(cb);
+  post_like_model.find({post_id: this._id, user_id: this.user_id, status: 1}).count(cb);
+};
+// returing total no of comments for the post as a callback
+postSchema.methods.get_no_of_comments = function(cb){
+  post_comment_model.find({post_id: this._id, user_id: this.user_id, status: 1}).count(cb);
+};
+// check if post is liked by user
+postSchema.methods.is_liked = function(user_id, cb){
+  post_like_model.find({post_id: this._id, user_id: user_id, status: 1}).count(cb);
 };
 
-postSchema
-.virtual('no_of_comments')
-.get(function(){
-  return 1;
-});
 
 // connect with DB
 // mongoose.connect('mongodb://127.0.0.1:27017/messenger');

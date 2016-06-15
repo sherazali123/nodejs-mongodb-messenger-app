@@ -25,14 +25,31 @@ exports.index = function(token, page, page_size, callback){
       .sort('-created_on')
       .populate({path: 'user_id', select: '-hashed_password -salt -token'})
       .exec(function(err, posts){
+        var iterator = 0;
+        var result = [];
 
-        callback({
-          status: 'success',
-          msg: 'List of posts',
-          posts: posts,
+        posts.forEach(function(post){
+          post.get_no_of_likes(function(err, _likes){
+            post.get_no_of_comments(function(err, _comments){
+              // check if post is liked by current user
+              post.is_liked(user_id, function(err, _is_liked){
+                iterator++;
+                post  = post.toObject();
+                post.no_of_likes = _likes;
+                post.no_of_comments = _comments;
+                post.is_liked = (_is_liked > 0 ? 1 : 0);
+                result.push(post);
+                if(iterator == posts.length){
+                  callback({
+                    status: 'success',
+                    msg: 'List of posts',
+                    posts: result,
+                  });
+                }
+              });
+            });
+          });
         });
-
-
       });
     } else {
       callback({status: 'error', errors: [{

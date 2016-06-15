@@ -92,9 +92,11 @@ exports.user_profile = function(token, user_profile_id, callback){
                             });
                           }
                         });
+                      } else {
+                        // if viewing his own profile
+                        callback({status: 'success', msg: 'User found.', user: user_data});
                       }
-                      // if viewing his own profile
-                      callback({status: 'success', msg: 'User found.', user: user_data});
+
 
                     } else {
                       callback({status: 'error', errors: [{
