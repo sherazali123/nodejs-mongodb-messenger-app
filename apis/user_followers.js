@@ -105,52 +105,59 @@ var
 
         user_model.findOne({_id: user_profile_id}, function(err2, user_profile){
           if(user_profile){
-
-            user_follower_model
-            .findOne({follower: user._id, following: user_profile._id}, function(err, user_follower){
-              if(!err){
-                if(user_follower){
-                  user_follower.status = status;
-                  user_follower.updated_on = new Date();
-                } else {
-                  user_follower = new user_follower_model({
-                    follower: user._id,
-                    following: user_profile._id,
-                    status: status,
-                  });
-                }
-                user_follower.save(function(err, user_follower){
-                  if(!err){
-                    user_follower_model
-                    .findOne({_id: user_follower._id})
-                    .populate({path: 'follower', select: '-hashed_password -salt -token'})
-                    .populate({path: 'following', select: '-hashed_password -salt -token'})
-                    .exec(function(err, user_follower){
-                      callback({
-                        status: 'success',
-                        msg: (status === 0 ? 'unfollowed' : 'Followed'),
-                        user_follower: user_follower,
-                      });
-                    });
+            if(user._id.toString() !== user_profile._id.toString()){
+              user_follower_model
+              .findOne({follower: user._id, following: user_profile._id}, function(err, user_follower){
+                if(!err){
+                  if(user_follower){
+                    user_follower.status = status;
+                    user_follower.updated_on = new Date();
                   } else {
-                    callback({status: 'error', errors: [{
-                        param: 'user_follower',
-                        msg: "user_follower save failed",
-                        value: ''
-                      }]
+                    user_follower = new user_follower_model({
+                      follower: user._id,
+                      following: user_profile._id,
+                      status: status,
                     });
                   }
-                });
-              } else {
-                callback({status: 'error', errors: [{
-                    param: 'error',
-                    msg: 'An error occoured while following/unfollowing.',
-                    value: '',
-                  }],
-                });
-              }
-            });
-
+                  user_follower.save(function(err, user_follower){
+                    if(!err){
+                      user_follower_model
+                      .findOne({_id: user_follower._id})
+                      .populate({path: 'follower', select: '-hashed_password -salt -token'})
+                      .populate({path: 'following', select: '-hashed_password -salt -token'})
+                      .exec(function(err, user_follower){
+                        callback({
+                          status: 'success',
+                          msg: (status === 0 ? 'unfollowed' : 'Followed'),
+                          user_follower: user_follower,
+                        });
+                      });
+                    } else {
+                      callback({status: 'error', errors: [{
+                          param: 'user_follower',
+                          msg: "user_follower save failed",
+                          value: ''
+                        }]
+                      });
+                    }
+                  });
+                } else {
+                  callback({status: 'error', errors: [{
+                      param: 'error',
+                      msg: 'An error occoured while following/unfollowing.',
+                      value: '',
+                    }],
+                  });
+                }
+              });
+            } else {
+              callback({status: 'error', errors: [{
+                  param: 'user_profile_id',
+                  msg: 'User can not follow/unfollow to himself.',
+                  value: user_profile_id,
+                }],
+              });
+            }
 
           } else {
             callback({status: 'error', errors: [{
