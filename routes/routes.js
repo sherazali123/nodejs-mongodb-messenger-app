@@ -316,7 +316,7 @@ module.exports      = function(app, express){
     //token form the header
     req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
     // check if the user liked the post or disliked
-    req.checkBody("is_liked", "is_liked is missing.").isIn([0,1, false, true]);
+    req.checkBody("is_liked", "is_liked is missing.").isIn([0,1]);
     // the post being liked or disliked
     req.checkBody("post_id", "Post id is missing").notEmpty();
     // see if there is any error in the request
@@ -336,7 +336,9 @@ module.exports      = function(app, express){
         // as status the state of the post deleted / active / blocked
         status                = 1;
       // convert is_like to Boolean
+      is_liked = parseInt(is_liked);
       is_liked = Boolean(is_liked);
+
       // create post
       post_like_controller.create(token, is_liked, post_id, status, function(found){
         console.log(found);
