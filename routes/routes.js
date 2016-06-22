@@ -236,6 +236,55 @@ module.exports      = function(app, express){
 
   });
 
+  /******************Followers/Followings*****************/
+
+  // An end point returns posts list with all properties
+  app.get('/user/followers/:user_id', function(req, res){
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    req.checkParams("user_id", "user_id is missing").notEmpty();
+    req.checkQuery("page", "Invalid page no.").isValidPageNo();
+    req.checkQuery("page_size", "Invalid page size.").isValidPageSize();
+
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        token                 = req.headers.token,
+        user_id               = req.params.user_id,
+        page                  = req.query.page,
+        page_size             = req.query.page_size;
+
+      user_follower_controller.followers(token, user_id, page, page_size, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+  });
+
+  // An end point returns posts list with all properties
+  app.get('/user/followings/:user_id', function(req, res){
+    req.checkHeaders("token", "Token is missing/invalid.").notEmpty();
+    req.checkParams("user_id", "user_id is missing").notEmpty();
+    req.checkQuery("page", "Invalid page no.").isValidPageNo();
+    req.checkQuery("page_size", "Invalid page size.").isValidPageSize();
+
+    var errors = req.validationErrors();
+    if(errors){
+      res.send({status: 'error', errors: errors});
+    } else {
+      var
+        token                 = req.headers.token,
+        user_id               = req.params.user_id,
+        page                  = req.query.page,
+        page_size             = req.query.page_size;
+
+      user_follower_controller.followings(token, user_id, page, page_size, function(found){
+        console.log(found);
+        res.json(found);
+      });
+    }
+  });
 
   /************************ POST *************************/
 
