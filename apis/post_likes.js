@@ -68,7 +68,7 @@ exports.create  = function(token, is_liked, post_id, status, callback){
                 .exec(function(err, post_like){
                   callback({
                     status: 'success',
-                    msg: (is_liked === true ? 'Liked' : 'Disliked'),
+                    msg: (is_liked === 1 ? 'Liked' : 'Disliked'),
                     // the current post
                     post: post,
                     // the current post_like

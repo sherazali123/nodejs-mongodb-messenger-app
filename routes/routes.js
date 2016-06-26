@@ -386,7 +386,7 @@ module.exports      = function(app, express){
         status                = 1;
       // convert is_like to Boolean
       is_liked = parseInt(is_liked);
-      is_liked = Boolean(is_liked);
+      // is_liked = Boolean(is_liked);
 
       // create post
       post_like_controller.create(token, is_liked, post_id, status, function(found){

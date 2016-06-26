@@ -9,7 +9,7 @@ var
   validate        = require('mongoose-validator');
 
 var postLikeSchema    = mongoose.Schema({
-    is_liked: Boolean,
+    is_liked: Number,
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
     post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'posts' },
     status: Number,
